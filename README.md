@@ -1,7 +1,7 @@
 # MQTTnetDemo
 ## _簡介_
 
-MQTTnetDemo是用聊天室來展示如何用==MQTTnet==來進行MQTT基本的==subscribe==和==publish==的功能
+MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subscribe`和`publish`的功能
 
 ## MQTTBrokerConsole
 此為用MQTTnet實作的聊天室server，這邊開始講解如何使用MqttServer
@@ -20,7 +20,7 @@ var serverOptions = new MqttServerOptionsBuilder()
     .WithApplicationMessageInterceptor(InterceptMessage)
     .Build();
 ```
-其中==WithConnectionValidator==、==WithSubscriptionInterceptor==、==WithApplicationMessageInterceptor==為非必要，
+其中`WithConnectionValidator`、`WithSubscriptionInterceptor`、`WithApplicationMessageInterceptor`為非必要，
 如果要對客戶端進行驗證，就用WithConnectionValidator
 
 ServerOptions建立好後，再來就要開始準備MqttServer，建立方法如下
@@ -61,7 +61,7 @@ private void OnApplicationMessageReceived(MqttApplicationMessageReceivedEventArg
     Console.WriteLine(topic + Environment.NewLine + chatMessage.ToChatString());
 }
 ```
-使用者傳送的訊息都在==e.ApplicationMessage==內，==Topic==跟==Payload==都在裡面
+使用者傳送的訊息都在`e.ApplicationMessage`內，`Topic`跟`Payload`都在裡面
 
 #### ClientConnectedHandler
 ClientConnectedHandler是一個MqttServerClientConnectedHandlerDelegate，用來處理客戶端成功連線server的事件，
@@ -130,7 +130,7 @@ await mqttServer.StartAsync(serverOptions);
 詳細實作方式請參閱[MQTTChatHandler.cs][MQTTChatHandler]
 
 ## MQTTChatClient
-此為用MQTTnet實作的客戶端聊天室Winform視窗，這邊講解MQTTChatClient的核心部分==MQTTChatClientHandler.cs==的實作方法
+此為用MQTTnet實作的客戶端聊天室Winform視窗，這邊講解MQTTChatClient的核心部分`MQTTChatClientHandler.cs`的實作方法
 
 ### 初始化MqttClient
 要建立MQTT客戶端前，必須先建立MQTT的IMqttClientOptions，建立方法如下
@@ -173,7 +173,7 @@ private void OnMessageReceived(MqttApplicationMessageReceivedEventArgs e)
     // Do whatever you want
 }
 ```
-server端傳送的訊息都在==e.ApplicationMessage==內，==Topic==跟==Payload==都在裡面
+server端傳送的訊息都在`e.ApplicationMessage`內，`Topic`跟`Payload`都在裡面
 
 #### ConnectedHandler
 ConnectedHandler是一個MqttClientConnectedHandlerDelegate，是用來處理連線成功的事件，
@@ -206,7 +206,7 @@ private void OnClientDisconnected(MqttClientDisconnectedEventArgs e)
     handler = null;
 }
 ```
-其中==e.Exception != null && e.ClientWasConnected==為連線成功後中斷的狀態
+其中`e.Exception != null && e.ClientWasConnected`為連線成功後中斷的狀態
 
 ### 啟動Client
 在clientOptions以及handler都設定好後，就可以啟動client了
