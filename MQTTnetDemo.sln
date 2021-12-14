@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTBrokerConsole", "MQTTBrokerConsole\MQTTBrokerConsole.csproj", "{6FA36C25-6B98-4514-BB06-DBBED60E84EA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTChatClient", "MQTTChatClient\MQTTChatClient.csproj", "{A733F3B0-FDE0-4E14-9358-3534E6F6E121}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTDataAccessLib", "MQTTDataAccessLib\MQTTDataAccessLib.csproj", "{1255522E-305F-4BFB-B3FC-0CF832F708BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6FA36C25-6B98-4514-BB06-DBBED60E84EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FA36C25-6B98-4514-BB06-DBBED60E84EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FA36C25-6B98-4514-BB06-DBBED60E84EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FA36C25-6B98-4514-BB06-DBBED60E84EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A733F3B0-FDE0-4E14-9358-3534E6F6E121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A733F3B0-FDE0-4E14-9358-3534E6F6E121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A733F3B0-FDE0-4E14-9358-3534E6F6E121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A733F3B0-FDE0-4E14-9358-3534E6F6E121}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1255522E-305F-4BFB-B3FC-0CF832F708BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1255522E-305F-4BFB-B3FC-0CF832F708BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1255522E-305F-4BFB-B3FC-0CF832F708BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1255522E-305F-4BFB-B3FC-0CF832F708BE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E40A568-E5F0-41D0-BF20-224404BD3F79}
+	EndGlobalSection
+EndGlobal
