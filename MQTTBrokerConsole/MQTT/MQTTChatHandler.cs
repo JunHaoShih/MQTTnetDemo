@@ -24,7 +24,7 @@ namespace MQTTBrokerConsole.MQTT
         private async Task StartMQTTServerAsync()
         {
             Console.WriteLine("Starting MQTT server...");
-            var optionsBuilder = new MqttServerOptionsBuilder()
+            var serverOptions = new MqttServerOptionsBuilder()
                 .WithConnectionBacklog(100)
                 .WithDefaultEndpointPort(1883)
                 // 設定連線者的驗證
@@ -32,7 +32,8 @@ namespace MQTTBrokerConsole.MQTT
                 // 設定訂閱的攔截事件
                 .WithSubscriptionInterceptor(InterCeptSubscription)
                 // 設定訊息的攔截事件
-                .WithApplicationMessageInterceptor(InterceptMessage);
+                .WithApplicationMessageInterceptor(InterceptMessage)
+                .Build();
             var mqttServer = new MqttFactory().CreateMqttServer();
             // 設定server接收到客戶端發送的訊息的事件
             mqttServer.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(OnApplicationMessageReceived);
@@ -45,7 +46,7 @@ namespace MQTTBrokerConsole.MQTT
             // 客戶端向server取消訂閱特定Topic的事件
             mqttServer.ClientUnsubscribedTopicHandler = new MqttServerClientUnsubscribedTopicHandlerDelegate(OnTopicUnsubscribe);
             // 開啟MQTT server
-            await mqttServer.StartAsync(optionsBuilder.Build());
+            await mqttServer.StartAsync(serverOptions);
             Console.WriteLine("MQTT server started!");
         }
 
@@ -131,7 +132,9 @@ namespace MQTTBrokerConsole.MQTT
         /// <param name="e"></param>
         private void OnApplicationMessageReceived(MqttApplicationMessageReceivedEventArgs e)
         {
+            // 客戶針對的Topic
             string topic = e.ApplicationMessage.Topic;
+            // Payload是客戶端發送過來的訊息，為byte[]，請依照自己的需求轉換
             string message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
             ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
             Console.WriteLine(topic + Environment.NewLine + chatMessage.ToChatString());

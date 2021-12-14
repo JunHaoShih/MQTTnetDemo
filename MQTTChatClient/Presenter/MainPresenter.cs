@@ -111,7 +111,7 @@ namespace MQTTClientFormTest.Presenter
         }
 
         /// <summary>
-        /// 處理客戶端收到server傳來的訊息要怎麼處理，主要的事情有<br/>
+        /// 處理收到server傳來的訊息要怎麼處理，主要的事情有<br/>
         /// 1. 將server的訊息轉換成ChatMessage並加到ChatUI上
         /// </summary>
         /// <param name="e"></param>
