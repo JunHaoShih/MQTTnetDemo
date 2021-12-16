@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MQTTClientFormTest.View
+namespace MQTTChatClient.View
 {
     public partial class JoinChatDialog : Form
     {

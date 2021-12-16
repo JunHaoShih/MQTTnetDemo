@@ -1,5 +1,5 @@
 ﻿
-namespace MQTTClientFormTest.View
+namespace MQTTChatClient.View
 {
     partial class JoinChatDialog
     {

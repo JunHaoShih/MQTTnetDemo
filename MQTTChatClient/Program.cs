@@ -1,11 +1,11 @@
-using MQTTClientFormTest.Presenter;
+using MQTTChatClient.Presenter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MQTTClientFormTest
+namespace MQTTChatClient
 {
     static class Program
     {

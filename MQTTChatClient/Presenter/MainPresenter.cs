@@ -1,6 +1,6 @@
 ﻿using MQTTChatClient.Enumerations;
-using MQTTClientFormTest.MQTT;
-using MQTTClientFormTest.View;
+using MQTTChatClient.MQTT;
+using MQTTChatClient.View;
 using MQTTDataAccessLib.Data;
 using MQTTnet;
 using MQTTnet.Client.Connecting;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MQTTClientFormTest.Presenter
+namespace MQTTChatClient.Presenter
 {
     /// <summary>
     /// 聊天室主視窗的Presenter

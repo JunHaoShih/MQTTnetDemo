@@ -1,5 +1,5 @@
 ﻿
-namespace MQTTClientFormTest
+namespace MQTTChatClient
 {
     partial class MainForm
     {

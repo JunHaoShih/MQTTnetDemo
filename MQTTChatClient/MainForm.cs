@@ -1,6 +1,6 @@
 ﻿using MQTTChatClient.Enumerations;
-using MQTTClientFormTest.MQTT;
-using MQTTClientFormTest.View;
+using MQTTChatClient.MQTT;
+using MQTTChatClient.View;
 using MQTTDataAccessLib.Data;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MQTTClientFormTest
+namespace MQTTChatClient
 {
     /// <summary>
     /// 聊天室的主視窗

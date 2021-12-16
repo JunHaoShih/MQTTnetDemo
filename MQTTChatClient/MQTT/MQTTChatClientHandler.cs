@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MQTTClientFormTest.MQTT
+namespace MQTTChatClient.MQTT
 {
     /// <summary>
     /// MQTT客戶端聊天室
