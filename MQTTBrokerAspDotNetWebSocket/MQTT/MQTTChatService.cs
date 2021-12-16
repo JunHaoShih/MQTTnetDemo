@@ -26,6 +26,7 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
         public void BuildMqttServerOptions(AspNetMqttServerOptionsBuilder optionsBuilder)
         {
             optionsBuilder.WithoutDefaultEndpoint()
+                .WithPersistentSessions()
                 .WithConnectionBacklog(appSettings.MqttBacklogs)
                 .WithConnectionValidator(ValidateConnector)
                 .WithSubscriptionInterceptor(InterCeptSubscription)

@@ -130,6 +130,7 @@ namespace MQTTClientFormTest.Presenter
         {
             var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
             ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
+            view.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
             view.AppendTopicMessage(e.ApplicationMessage.Topic, chatMessage);
         }
 

@@ -97,10 +97,20 @@ namespace MQTTClientFormTest
 
                 TabPage tabPage = new TabPage(topic);
                 tabPage.Controls.Add(chatControl);
-                tabControlChat.TabPages.Add(tabPage);
+                //tabControlChat.TabPages.Add(tabPage);
+                AddTabPage(tabPage);
                 return true;
             }
             return false;
+        }
+
+        private void AddTabPage(TabPage tabPage)
+        {
+            var result = tabControlChat.BeginInvoke((MethodInvoker)delegate
+            {
+                tabControlChat.TabPages.Add(tabPage);
+            });
+            tabControlChat.EndInvoke(result);
         }
 
         /// <summary>

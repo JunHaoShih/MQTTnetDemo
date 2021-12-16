@@ -80,8 +80,8 @@ namespace MQTTClientFormTest.MQTT
                     .WithTcpServer(ip, port)
                     .WithCredentials(userName, password)
                     // ClientId不給的話，系統會自動生成
-                    //.WithClientId(userName)
-                    .WithCleanSession(true)
+                    .WithClientId(userName)
+                    .WithCleanSession(false)
                     .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
                     .Build();
 
@@ -116,8 +116,8 @@ namespace MQTTClientFormTest.MQTT
                     .WithWebSocketServer($"ws://{ip}:{port}/{path}")
                     .WithCredentials(userName, password)
                     // ClientId不給的話，系統會自動生成
-                    //.WithClientId(userName)
-                    .WithCleanSession(true)
+                    .WithClientId(userName)
+                    .WithCleanSession(false)
                     .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
                     .Build();
 
@@ -181,7 +181,7 @@ namespace MQTTClientFormTest.MQTT
             {
                 var topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
-                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce)
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
                 await mqttClient.SubscribeAsync(topicFilter);
             }
@@ -228,7 +228,8 @@ namespace MQTTClientFormTest.MQTT
                 var applicationMessage = new MqttApplicationMessageBuilder()
                     .WithTopic(topic)
                     .WithPayload(Encoding.UTF8.GetBytes(message))
-                    .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce)
+                    .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
+                    //.WithRetainFlag(true)
                     .Build();
                 await mqttClient.PublishAsync(applicationMessage);
             }
