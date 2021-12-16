@@ -16,6 +16,8 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
 {
     public class MQTTChatService
     {
+        private IMqttServer mqttServer;
+
         private readonly AppSettings appSettings;
 
         public MQTTChatService(AppSettings appSettings)
@@ -46,6 +48,8 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
             mqttServer.ClientSubscribedTopicHandler = new MqttServerClientSubscribedTopicHandlerDelegate(OnTopicSubscribe);
             // 客戶端向server取消訂閱特定Topic的事件
             mqttServer.ClientUnsubscribedTopicHandler = new MqttServerClientUnsubscribedTopicHandlerDelegate(OnTopicUnsubscribe);
+
+            this.mqttServer = mqttServer;
         }
 
         /// <summary>
@@ -121,7 +125,9 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
         /// <param name="e"></param>
         private void OnTopicSubscribe(MqttServerClientSubscribedTopicEventArgs e)
         {
-            Console.WriteLine($"客戶端: { e.ClientId } 已訂閱「{ e.TopicFilter.Topic }」!");
+            string message = $"客戶端: { e.ClientId } 已進入「{ e.TopicFilter.Topic }」!";
+            Console.WriteLine(message);
+            PublishMessage(e.TopicFilter.Topic, message);
         }
 
         /// <summary>
@@ -130,7 +136,23 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
         /// <param name="e"></param>
         private void OnTopicUnsubscribe(MqttServerClientUnsubscribedTopicEventArgs e)
         {
-            Console.WriteLine($"客戶端: { e.ClientId } 已取消訂閱「{ e.TopicFilter }」!");
+            string message = $"客戶端: { e.ClientId } 已離開「{ e.TopicFilter }」!";
+            Console.WriteLine(message);
+            PublishMessage(e.TopicFilter, message);
+        }
+
+        private void PublishMessage(string topic, string payload, MqttQualityOfServiceLevel qos = MqttQualityOfServiceLevel.ExactlyOnce, bool retain = false)
+        {
+            ChatMessage chatMessage = new ChatMessage() { UserName = "系統訊息", Message = payload };
+            var jsonStr = JsonConvert.SerializeObject(chatMessage);
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(jsonStr)
+                .WithQualityOfServiceLevel(qos)
+                .WithRetainFlag(retain)
+                .Build();
+
+            mqttServer.PublishAsync(message);
         }
     }
 }
