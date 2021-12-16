@@ -1,4 +1,5 @@
-﻿using MQTTClientFormTest.MQTT;
+﻿using MQTTChatClient.Enumerations;
+using MQTTClientFormTest.MQTT;
 using MQTTClientFormTest.View;
 using MQTTDataAccessLib.Data;
 using MQTTnet;
@@ -53,16 +54,26 @@ namespace MQTTClientFormTest.Presenter
         /// <summary>
         /// 與MQTT伺服器連線
         /// </summary>
+        /// <param name="protocol">MQTT通訊協定類型</param>
+        /// <param name="path">WebSocket路徑</param>
         /// <param name="ip">MQTT伺服器的IP</param>
         /// <param name="port">MQTT伺服器的PORT</param>
         /// <param name="userName">帳號</param>
         /// <param name="password">密碼</param>
-        private void ConnectToMqttServer(string ip, int port, string userName, string password)
+        private void ConnectToMqttServer(MQTTProtocol protocol, string path, string ip, int port, string userName, string password)
         {
             if (handler == null)
             {
                 handler = new MQTTChatClientHandler(ip, port, userName, password);
-                _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                switch (protocol)
+                {
+                    case MQTTProtocol.TCP:
+                        _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                        break;
+                    case MQTTProtocol.WebSocket:
+                        _ = handler.WebSocketClientStartAsync(path, OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                        break;
+                }
             }
         }
 

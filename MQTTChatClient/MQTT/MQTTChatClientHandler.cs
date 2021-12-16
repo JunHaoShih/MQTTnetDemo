@@ -61,7 +61,7 @@ namespace MQTTClientFormTest.MQTT
         }
         
         /// <summary>
-        /// 非同步啟動客戶端
+        /// 以TCP非同步啟動客戶端
         /// </summary>
         /// <param name="OnMessageReceived">處理收到server訊息的method</param>
         /// <param name="OnClientConnected">處理客戶端成功連線的method</param>
@@ -85,19 +85,72 @@ namespace MQTTClientFormTest.MQTT
                     .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
                     .Build();
 
-                mqttClient = new MqttFactory().CreateMqttClient();
-
-                mqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(OnMessageReceived);
-                mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(OnClientConnected);
-                mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(OnClientDisconnected);
-                // 開始非同步連線
-                // PS: 非同步連線(有await)出錯會直接拋出Exception，同步則是會觸發OnClientDisconnected
-                await mqttClient.ConnectAsync(options);
+                await LaunchClient(options, OnMessageReceived, OnClientConnected, OnClientDisconnected);
             }
             catch (Exception e)
             {
                 OnError(e.Message);
             }
+        }
+
+        /// <summary>
+        /// 以WebSocket非同步啟動客戶端
+        /// </summary>
+        /// <param name="path">WebSocket路徑</param>
+        /// <param name="OnMessageReceived">處理收到server訊息的method</param>
+        /// <param name="OnClientConnected">處理客戶端成功連線的method</param>
+        /// <param name="OnClientDisconnected">處理客戶端離線的method</param>
+        /// <param name="OnError">處理發生異常的method</param>
+        /// <returns></returns>
+        public async Task WebSocketClientStartAsync(
+            string path,
+            Action<MqttApplicationMessageReceivedEventArgs> OnMessageReceived,
+            Action<MqttClientConnectedEventArgs> OnClientConnected,
+            Action<MqttClientDisconnectedEventArgs> OnClientDisconnected,
+            Action<string> OnError)
+        {
+            try
+            {
+                // 建立客戶端options
+                var options = new MqttClientOptionsBuilder()
+                    .WithWebSocketServer($"ws://{ip}:{port}/{path}")
+                    .WithCredentials(userName, password)
+                    // ClientId不給的話，系統會自動生成
+                    //.WithClientId(userName)
+                    .WithCleanSession(true)
+                    .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
+                    .Build();
+
+                await LaunchClient(options, OnMessageReceived, OnClientConnected, OnClientDisconnected);
+            }
+            catch (Exception e)
+            {
+                OnError(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 依據MQTT client的啟動選項來啟動MqttClient
+        /// </summary>
+        /// <param name="options">MQTT client的啟動選項</param>
+        /// <param name="OnMessageReceived">處理收到server訊息的method</param>
+        /// <param name="OnClientConnected">處理客戶端成功連線的method</param>
+        /// <param name="OnClientDisconnected">處理客戶端離線的method</param>
+        /// <returns></returns>
+        private async Task LaunchClient(
+            IMqttClientOptions options,
+            Action<MqttApplicationMessageReceivedEventArgs> OnMessageReceived,
+            Action<MqttClientConnectedEventArgs> OnClientConnected,
+            Action<MqttClientDisconnectedEventArgs> OnClientDisconnected)
+        {
+            mqttClient = new MqttFactory().CreateMqttClient();
+
+            mqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(OnMessageReceived);
+            mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(OnClientConnected);
+            mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(OnClientDisconnected);
+            // 開始非同步連線
+            // PS: 非同步連線(有await)出錯會直接拋出Exception，同步則是會觸發OnClientDisconnected
+            await mqttClient.ConnectAsync(options);
         }
 
         /// <summary>

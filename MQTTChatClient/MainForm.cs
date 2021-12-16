@@ -1,4 +1,5 @@
-﻿using MQTTClientFormTest.MQTT;
+﻿using MQTTChatClient.Enumerations;
+using MQTTClientFormTest.MQTT;
 using MQTTClientFormTest.View;
 using MQTTDataAccessLib.Data;
 using System;
@@ -21,7 +22,7 @@ namespace MQTTClientFormTest
         /// <summary>
         /// 連線按鈕click事件
         /// </summary>
-        public event Action<string, int, string, string> OnConnectionClicked;
+        public event Action<MQTTProtocol, string, string, int, string, string> OnConnectionClicked;
 
         /// <summary>
         /// 登出按鈕click事件
@@ -45,6 +46,7 @@ namespace MQTTClientFormTest
         {
             InitializeComponent();
             topicControls = new Dictionary<string, ChatControl>();
+            cbProtocol.DataSource = Enum.GetValues(typeof(MQTTProtocol));
         }
 
         /// <summary>
@@ -53,15 +55,16 @@ namespace MQTTClientFormTest
         /// <param name="enable"></param>
         public void EnableConnectionUI(bool enable)
         {
-            var result = panelTop.BeginInvoke((MethodInvoker)delegate
+            var result = tlpConnection.BeginInvoke((MethodInvoker)delegate
             {
-                tbIp.Enabled = enable;
+                /*tbIp.Enabled = enable;
                 nudPort.Enabled = enable;
                 tbUserName.Enabled = enable;
-                tbPassword.Enabled = enable;
+                tbPassword.Enabled = enable;*/
+                tlpConnection.Enabled = enable;
                 btnConnect.Enabled = enable;
             });
-            panelTop.EndInvoke(result);
+            tlpConnection.EndInvoke(result);
         }
 
         /// <summary>
@@ -125,7 +128,8 @@ namespace MQTTClientFormTest
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            OnConnectionClicked.Invoke(tbIp.Text, ((int)nudPort.Value), tbUserName.Text, tbPassword.Text);
+            MQTTProtocol protocol = (MQTTProtocol)cbProtocol.SelectedItem;
+            OnConnectionClicked.Invoke(protocol, tbPath.Text, tbIp.Text, ((int)nudPort.Value), tbUserName.Text, tbPassword.Text);
         }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
@@ -143,6 +147,20 @@ namespace MQTTClientFormTest
             if (e.KeyChar == (char)Keys.Enter)
             {
                 btnConnect.PerformClick();
+            }
+        }
+
+        private void cbProtocol_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            MQTTProtocol protocol = (MQTTProtocol)cbProtocol.SelectedItem;
+            switch (protocol)
+            {
+                case MQTTProtocol.TCP:
+                    tbPath.Enabled = false;
+                    break;
+                case MQTTProtocol.WebSocket:
+                    tbPath.Enabled = true;
+                    break;
             }
         }
     }
