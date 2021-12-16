@@ -1,4 +1,8 @@
 # MQTTnetDemo
+
+## TODO
+補充WebSocket連線說明
+
 ## _簡介_
 
 MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subscribe`和`publish`的功能
