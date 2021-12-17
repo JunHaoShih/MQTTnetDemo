@@ -1,7 +1,8 @@
 ﻿using MQTTChatClient.Enumerations;
 using MQTTChatClient.MQTT;
 using MQTTChatClient.View;
-using MQTTDataAccessLib.Data;
+using MQTTDataAccessLib.Models;
+using MQTTDataAccessLib.Models.DataTypes;
 using MQTTnet;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
@@ -64,16 +65,27 @@ namespace MQTTChatClient.Presenter
         {
             if (handler == null)
             {
-                handler = new MQTTChatClientHandler(ip, port, userName, password);
-                switch (protocol)
+                var isUserNameValid = UserName.TryParse(userName, out UserName userNameObj);
+                var isPasswordValid = Password.TryParse(password, out Password passwordObj);
+                if (isUserNameValid && isPasswordValid)
                 {
-                    case MQTTProtocol.TCP:
-                        _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
-                        break;
-                    case MQTTProtocol.WebSocket:
-                        _ = handler.WebSocketClientStartAsync(path, OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
-                        break;
+                    handler = new MQTTChatClientHandler(ip, port, userNameObj, passwordObj);
+                    switch (protocol)
+                    {
+                        case MQTTProtocol.TCP:
+                            _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                            break;
+                        case MQTTProtocol.WebSocket:
+                            _ = handler.WebSocketClientStartAsync(path, OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                            break;
+                    }
                 }
+                else
+                {
+                    OnError("帳號密碼格式不正確");
+                }
+
+                
             }
         }
 
@@ -129,9 +141,9 @@ namespace MQTTChatClient.Presenter
         private void OnMessageReceived(MqttApplicationMessageReceivedEventArgs e)
         {
             var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
-            ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
+            ChatRoomMessage chatRoomMessage = JsonConvert.DeserializeObject<ChatRoomMessage>(message);
             view.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
-            view.AppendTopicMessage(e.ApplicationMessage.Topic, chatMessage);
+            view.AppendTopicMessage(e.ApplicationMessage.Topic, chatRoomMessage);
         }
 
         /// <summary>

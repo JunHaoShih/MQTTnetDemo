@@ -1,7 +1,8 @@
 ﻿using MQTTChatClient.Enumerations;
 using MQTTChatClient.MQTT;
 using MQTTChatClient.View;
-using MQTTDataAccessLib.Data;
+using MQTTDataAccessLib.Models;
+using MQTTDataAccessLib.Models.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,6 +48,8 @@ namespace MQTTChatClient
             InitializeComponent();
             topicControls = new Dictionary<string, ChatControl>();
             cbProtocol.DataSource = Enum.GetValues(typeof(MQTTProtocol));
+            tbUserName.MaxLength = UserName.MaxLength;
+            tbPassword.MaxLength = Password.MaxLength;
         }
 
         /// <summary>
@@ -118,7 +121,7 @@ namespace MQTTChatClient
         /// </summary>
         /// <param name="topic">topic</param>
         /// <param name="chatMessage">topic的聊天訊息</param>
-        public void AppendTopicMessage(string topic, ChatMessage chatMessage)
+        public void AppendTopicMessage(string topic, ChatRoomMessage chatMessage)
         {
             topicControls[topic].AppendChatMessage(chatMessage);
         }

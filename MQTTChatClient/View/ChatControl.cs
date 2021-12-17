@@ -1,4 +1,5 @@
-﻿using MQTTDataAccessLib.Data;
+﻿using MQTTDataAccessLib.Models;
+using MQTTDataAccessLib.Models.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,6 +29,7 @@ namespace MQTTChatClient.View
         public ChatControl()
         {
             InitializeComponent();
+            tbMessageInput.MaxLength = ChatText.MaxLength;
         }
 
         private void btnSendMessage_Click(object sender, EventArgs e)
@@ -40,15 +42,18 @@ namespace MQTTChatClient.View
         /// </summary>
         private void SendMessageAndClear()
         {
-            OnBtnMessageSendClicked?.Invoke(lblTopic.Text, tbMessageInput.Text);
-            tbMessageInput.Clear();
+            if (tbMessageInput.TextLength > 0)
+            {
+                OnBtnMessageSendClicked?.Invoke(lblTopic.Text, tbMessageInput.Text);
+                tbMessageInput.Clear();
+            }
         }
 
         /// <summary>
         /// 將ChatMessage加入對話框
         /// </summary>
         /// <param name="chatMessage"></param>
-        public void AppendChatMessage(ChatMessage chatMessage)
+        public void AppendChatMessage(ChatRoomMessage chatMessage)
         {
             var result = tbChatBox.BeginInvoke((MethodInvoker)delegate
             {

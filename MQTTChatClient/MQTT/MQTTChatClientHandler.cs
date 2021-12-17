@@ -1,4 +1,5 @@
-﻿using MQTTDataAccessLib.Data;
+﻿using MQTTDataAccessLib.Models;
+using MQTTDataAccessLib.Models.DataTypes;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
@@ -38,12 +39,12 @@ namespace MQTTChatClient.MQTT
         /// <summary>
         /// 使用者名稱
         /// </summary>
-        private readonly string userName;
+        private readonly UserName userName;
 
         /// <summary>
         /// 密碼
         /// </summary>
-        private readonly string password;
+        private readonly Password password;
 
         /// <summary>
         /// MQTT客戶端聊天室的建構子，初始化連線資訊
@@ -52,7 +53,7 @@ namespace MQTTChatClient.MQTT
         /// <param name="port">MQTT server的Port</param>
         /// <param name="userName">使用者名稱</param>
         /// <param name="password">密碼</param>
-        public MQTTChatClientHandler(string ip, int port, string userName, string password)
+        public MQTTChatClientHandler(string ip, int port, UserName userName, Password password)
         {
             this.ip = ip;
             this.port = port;
@@ -223,8 +224,9 @@ namespace MQTTChatClient.MQTT
             try
             {
                 // 將ChatMessage轉換成json字串
-                ChatMessage chatMessage = new ChatMessage() { UserName = userName, Message = userInput };
-                var message = JsonConvert.SerializeObject(chatMessage);
+                ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = userName, ChatMessage = new ChatText(userInput), Topic = topic };
+                //ChatMessage chatMessage = new ChatMessage() { UserName = userName, Message = userInput };
+                var message = JsonConvert.SerializeObject(chatRoomMessage);
                 var applicationMessage = new MqttApplicationMessageBuilder()
                     .WithTopic(topic)
                     .WithPayload(Encoding.UTF8.GetBytes(message))

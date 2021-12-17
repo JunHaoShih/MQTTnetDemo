@@ -1,4 +1,5 @@
-﻿using MQTTDataAccessLib.Data;
+﻿using MQTTDataAccessLib.Models;
+using MQTTDataAccessLib.Models.DataTypes;
 using MQTTnet;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
@@ -17,6 +18,8 @@ namespace MQTTBrokerConsole.MQTT
     /// </summary>
     public class MQTTChatHandler
     {
+        private IMqttServer mqttServer;
+
         /// <summary>
         /// 非同步啟動MQTT Broker
         /// </summary>
@@ -27,6 +30,7 @@ namespace MQTTBrokerConsole.MQTT
             var serverOptions = new MqttServerOptionsBuilder()
                 .WithConnectionBacklog(100)
                 .WithDefaultEndpointPort(1883)
+                .WithPersistentSessions()
                 // 設定連線者的驗證
                 .WithConnectionValidator(ValidateConnector)
                 // 設定訂閱的攔截事件
@@ -34,7 +38,7 @@ namespace MQTTBrokerConsole.MQTT
                 // 設定訊息的攔截事件
                 .WithApplicationMessageInterceptor(InterceptMessage)
                 .Build();
-            var mqttServer = new MqttFactory().CreateMqttServer();
+            mqttServer = new MqttFactory().CreateMqttServer();
             // 設定server接收到客戶端發送的訊息的事件
             mqttServer.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(OnApplicationMessageReceived);
             // 設定客戶端成功連線server的事件
@@ -79,7 +83,9 @@ namespace MQTTBrokerConsole.MQTT
         /// <param name="e"></param>
         private void OnTopicSubscribe(MqttServerClientSubscribedTopicEventArgs e)
         {
-            Console.WriteLine($"客戶端: { e.ClientId } 已訂閱「{ e.TopicFilter.Topic }」!");
+            string message = $"客戶端: { e.ClientId } 已進入「{ e.TopicFilter.Topic }」!";
+            Console.WriteLine(message);
+            PublishMessage(e.TopicFilter.Topic, message);
         }
 
         /// <summary>
@@ -88,7 +94,9 @@ namespace MQTTBrokerConsole.MQTT
         /// <param name="e"></param>
         private void OnTopicUnsubscribe(MqttServerClientUnsubscribedTopicEventArgs e)
         {
-            Console.WriteLine($"客戶端: { e.ClientId } 已取消訂閱「{ e.TopicFilter }」!");
+            string message = $"客戶端: { e.ClientId } 已離開「{ e.TopicFilter }」!";
+            Console.WriteLine(message);
+            PublishMessage(e.TopicFilter, message);
         }
 
         /// <summary>
@@ -136,8 +144,9 @@ namespace MQTTBrokerConsole.MQTT
             string topic = e.ApplicationMessage.Topic;
             // Payload是客戶端發送過來的訊息，為byte[]，請依照自己的需求轉換
             string message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
-            ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
-            Console.WriteLine(topic + Environment.NewLine + chatMessage.ToChatString());
+            //ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
+            ChatRoomMessage chatRoomMessage = JsonConvert.DeserializeObject<ChatRoomMessage>(message);
+            Console.WriteLine(topic + Environment.NewLine + chatRoomMessage.ToChatString());
         }
 
         /// <summary>
@@ -156,6 +165,21 @@ namespace MQTTBrokerConsole.MQTT
         private void OnClientDisconnected(MqttServerClientDisconnectedEventArgs e)
         {
             Console.WriteLine($"客戶端: { e.ClientId } 已離線!");
+        }
+
+        private void PublishMessage(string topic, string payload, MqttQualityOfServiceLevel qos = MqttQualityOfServiceLevel.ExactlyOnce, bool retain = false)
+        {
+            ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = new UserName("系統訊息"), Topic = topic, ChatMessage = new ChatText(payload) };
+            //ChatMessage chatMessage = new ChatMessage() { UserName = "系統訊息", Message = payload };
+            var jsonStr = JsonConvert.SerializeObject(chatRoomMessage);
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(jsonStr)
+                .WithQualityOfServiceLevel(qos)
+                .WithRetainFlag(retain)
+                .Build();
+
+            mqttServer.PublishAsync(message);
         }
     }
 }

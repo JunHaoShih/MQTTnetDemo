@@ -1,3 +1,4 @@
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +29,9 @@ namespace MQTTBrokerAspDotNetWebSocket
             var httpPort = int.Parse(config["AppSettings:KestrelSettings:HttpPort"]);
             var httpsPort = int.Parse(config["AppSettings:KestrelSettings:HttpsPort"]);
 
-            return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
+            return Host.CreateDefaultBuilder(args)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+                .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseKestrel(kestrelServerOptions =>
                 {

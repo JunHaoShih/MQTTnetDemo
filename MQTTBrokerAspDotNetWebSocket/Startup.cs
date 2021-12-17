@@ -1,4 +1,5 @@
 using System.Linq;
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +47,18 @@ namespace MQTTBrokerAspDotNetWebSocket
                 .AddConnections();
 
             services.AddControllers();
+        }
+
+        /// <summary>
+        /// 這是Autofac註冊關聯的地方，註冊規則寫在ServiceModule內
+        /// </summary>
+        /// <param name="builder"></param>
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Register your own things directly with Autofac here. Don't
+            // call builder.Populate(), that happens in AutofacServiceProviderFactory
+            // for you.
+            builder.RegisterModule(new ServiceModule(Configuration));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
