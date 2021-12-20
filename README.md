@@ -1,7 +1,7 @@
 # MQTTnetDemo
 
 ## _簡介_
-若要觀看詳細說明，請至[Wiki][MQTTChatDemoWiki]
+若要觀看詳細說明，請至[Wiki][MQTTChatDemoWiki]  
 MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subscribe`和`publish`的功能
 
 PS: 本範例MQTTnet版本為`3.1.1`，而.NET版本為`.NET Core 3.1`
