@@ -7,6 +7,33 @@ MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subs
 
 PS: 本範例MQTTnet版本為`3.1.1`，而.NET版本為`.NET Core 3.1`
 
+## 啟動Server
+目前Server有二個版本
+ - MQTTBrokerConsole
+ - MQTTBrokerAspDotNetWebSocket
+
+擇一開啟即可，接下來會以`MQTTBrokerAspDotNetWebSocket`為例子
+### 啟動MQTTBrokerAspDotNetWebSocket
+點擊`MQTTBrokerAspDotNetWebSocket.exe`啟動MQTT web server  
+![image](https://imgur.com/tVKBglj.png)
+如上圖表示完成
+
+### 啟動客戶端
+點擊`MQTTChatClient.exe`啟動客戶端UI  
+![image](https://imgur.com/RhHWiKR.png)
+#### TCP
+下拉選單選擇TCP，輸入server ip、port(1883)以及UserName和密碼連線即可  
+(若UserName不存在，server會自動註冊該帳號密碼，若存在則會檢查密碼)
+![image](https://imgur.com/aUKMcJ7.png)
+#### WebSocket
+下拉選單選擇WebSocket，輸入server ip、port(5000)、path(mqtt)以及UserName和密碼連線即可  
+(若UserName不存在，server會自動註冊該帳號密碼，若存在則會檢查密碼)
+![image](https://imgur.com/bugsni5.png)
+
+### 加入聊天室
+連線後點選加入聊天室，輸入要加入的聊天室名稱(MQTT的Topic)，加入後即可開始使用
+
+---
 ## MQTTBrokerConsole
 此為用MQTTnet實作的聊天室server，這邊開始講解如何使用MqttServer
 
