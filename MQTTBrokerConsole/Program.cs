@@ -28,14 +28,10 @@ namespace MQTTBrokerConsole
             var builder = new ContainerBuilder();
             builder.RegisterType<MQTTApplication>();
             builder.RegisterType<MQTTChatService>();
-            //builder.RegisterType<SqliteChatServerSchemaDao>().As<IChatServerSchemaDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
             // 註冊Dao
+            builder.RegisterType<SqliteChatServerSchemaDao>().As<IChatServerSchemaDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
             builder.RegisterType<SqliteChatUserDao>().As<IChatUserDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
             builder.RegisterType<SqliteChatRoomMessageDao>().As<IChatRoomMessageDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
-
-            // initialize sqlite
-            IChatServerSchemaDao chatServerSchemaDao = new SqliteChatServerSchemaDao(sqlConnectionStr);
-            chatServerSchemaDao.InitializeSchema();
 
             return builder.Build();
         }
