@@ -63,8 +63,7 @@ private void OnApplicationMessageReceived(MqttApplicationMessageReceivedEventArg
     string topic = e.ApplicationMessage.Topic;
     // Payload是客戶端發送過來的訊息，為byte[]，請依照自己的需求轉換
     string message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
-    ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
-    Console.WriteLine(topic + Environment.NewLine + chatMessage.ToChatString());
+    // TODO 看你想要對訊息做甚麼
 }
 ```
 使用者傳送的訊息都在`e.ApplicationMessage`內，`Topic`跟`Payload`都在裡面
@@ -80,6 +79,7 @@ ClientConnectedHandler是一個MqttServerClientConnectedHandlerDelegate，用來
 private void OnClientConnected(MqttServerClientConnectedEventArgs e)
 {
     Console.WriteLine($"客戶端: { e.ClientId } 已連接!");
+    // TODO 看你想要做甚麼
 }
 ```
 
@@ -94,6 +94,7 @@ ClientDisconnectedHandler是一個MqttServerClientDisconnectedHandlerDelegate，
 private void OnClientDisconnected(MqttServerClientDisconnectedEventArgs e)
 {
     Console.WriteLine($"客戶端: { e.ClientId } 已離線!");
+    // TODO 看你想要做甚麼
 }
 ```
 
@@ -108,6 +109,7 @@ ClientSubscribedTopicHandler是一個MqttServerClientSubscribedTopicHandlerDeleg
 private void OnTopicSubscribe(MqttServerClientSubscribedTopicEventArgs e)
 {
     Console.WriteLine($"客戶端: { e.ClientId } 已訂閱「{ e.TopicFilter.Topic }」!");
+    // TODO 看你想要做甚麼
 }
 ```
 
@@ -122,6 +124,7 @@ ClientUnsubscribedTopicHandler是一個MqttServerClientUnsubscribedTopicHandlerD
 private void OnTopicUnsubscribe(MqttServerClientUnsubscribedTopicEventArgs e)
 {
     Console.WriteLine($"客戶端: { e.ClientId } 已取消訂閱「{ e.TopicFilter }」!");
+    // TODO 看你想要做甚麼
 }
 ```
 
@@ -145,7 +148,8 @@ var options = new MqttClientOptionsBuilder()
     .WithTcpServer(ip, port)
     .WithCredentials(userName, password)
     // ClientId不給的話，系統會自動生成
-    //.WithClientId(userName)
+    // PS: 所有連線的ClientId要一致，才有辦法收到離線的訊息
+    .WithClientId(userName)
     .WithCleanSession(true)
     .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
     .Build();
@@ -175,7 +179,6 @@ ApplicationMessageReceivedHandler是一個MqttApplicationMessageReceivedHandlerD
 private void OnMessageReceived(MqttApplicationMessageReceivedEventArgs e)
 {
     var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
-    ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
     // Do whatever you want
 }
 ```
