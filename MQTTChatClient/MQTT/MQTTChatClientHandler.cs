@@ -81,6 +81,7 @@ namespace MQTTChatClient.MQTT
                     .WithTcpServer(ip, port)
                     .WithCredentials(userName, password)
                     // ClientId不給的話，系統會自動生成
+                    // PS: 所有連線的ClientId要一致，才有辦法收到離線的訊息
                     .WithClientId(userName)
                     .WithCleanSession(false)
                     .WithCommunicationTimeout(TimeSpan.FromSeconds(2))
@@ -182,6 +183,8 @@ namespace MQTTChatClient.MQTT
             {
                 var topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
+                // Qos要大於0，客戶端才可收到離線訊息
+                // AtMostOnce = 0, AtLeastOnce = 1, ExactlyOnce = 2
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
                 await mqttClient.SubscribeAsync(topicFilter);
@@ -230,6 +233,8 @@ namespace MQTTChatClient.MQTT
                 var applicationMessage = new MqttApplicationMessageBuilder()
                     .WithTopic(topic)
                     .WithPayload(Encoding.UTF8.GetBytes(message))
+                    // Qos要大於0，客戶端才可收到離線訊息
+                    // AtMostOnce = 0, AtLeastOnce = 1, ExactlyOnce = 2
                     .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                     //.WithRetainFlag(true)
                     .Build();

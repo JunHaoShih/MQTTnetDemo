@@ -1,4 +1,5 @@
-﻿using MQTTDataAccessLib.Models;
+﻿using MQTTDataAccessLib.DAOs;
+using MQTTDataAccessLib.Models;
 using MQTTDataAccessLib.Models.DataTypes;
 using MQTTnet;
 using MQTTnet.Client.Receiving;
@@ -16,9 +17,19 @@ namespace MQTTBrokerConsole.MQTT
     /// <summary>
     /// MQTT Broker聊天室伺服器
     /// </summary>
-    public class MQTTChatHandler
+    public class MQTTChatService
     {
         private IMqttServer mqttServer;
+
+        private IChatUserDao chatUserDao;
+
+        private IChatRoomMessageDao chatRoomMessageDao;
+
+        public MQTTChatService(IChatUserDao chatUserDao, IChatRoomMessageDao chatRoomMessageDao)
+        {
+            this.chatUserDao = chatUserDao;
+            this.chatRoomMessageDao = chatRoomMessageDao;
+        }
 
         /// <summary>
         /// 非同步啟動MQTT Broker
@@ -105,13 +116,36 @@ namespace MQTTBrokerConsole.MQTT
         /// <param name="context"></param>
         private void ValidateConnector(MqttConnectionValidatorContext context)
         {
-            if (context.Password == "Password" && !String.IsNullOrWhiteSpace(context.Username))
+            /*if (context.Password == "Password" && !String.IsNullOrWhiteSpace(context.Username))
             {
                 Console.WriteLine($"使用者: { context.Username } 為合法使用者");
             }
             else
             {
                 Console.WriteLine($"使用者: { context.Username } 為非法使用者");
+                context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
+            }*/
+            var isUserNameValid = UserName.TryParse(context.Username, out UserName userName);
+            var isPasswordValid = Password.TryParse(context.Password, out Password password);
+            if (!isUserNameValid || !isPasswordValid)
+            {
+                context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
+                return;
+            }
+
+            var chatUser = chatUserDao.GetChatUser(userName);
+
+            if (chatUser == null)
+            {
+                chatUserDao.InsertChatUser(new ChatUser { UserName = userName, Password = password });
+            }
+            else if (chatUser != null && chatUser.Password.Equals(password))
+            {
+                Console.WriteLine($"使用者: { userName } 為合法使用者");
+            }
+            else
+            {
+                Console.WriteLine($"使用者: { userName } 為非法使用者");
                 context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
             }
         }
@@ -147,6 +181,11 @@ namespace MQTTBrokerConsole.MQTT
             //ChatMessage chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message);
             ChatRoomMessage chatRoomMessage = JsonConvert.DeserializeObject<ChatRoomMessage>(message);
             Console.WriteLine(topic + Environment.NewLine + chatRoomMessage.ToChatString());
+
+            chatRoomMessage = chatRoomMessageDao.InsertChatRoomMessage(chatRoomMessage);
+
+            string returnString = JsonConvert.SerializeObject(chatRoomMessage);
+            e.ApplicationMessage.Payload = Encoding.UTF8.GetBytes(returnString);
         }
 
         /// <summary>
@@ -167,9 +206,16 @@ namespace MQTTBrokerConsole.MQTT
             Console.WriteLine($"客戶端: { e.ClientId } 已離線!");
         }
 
+        /// <summary>
+        /// MQTT server專用的訊息發布method
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <param name="payload"></param>
+        /// <param name="qos"></param>
+        /// <param name="retain"></param>
         private void PublishMessage(string topic, string payload, MqttQualityOfServiceLevel qos = MqttQualityOfServiceLevel.ExactlyOnce, bool retain = false)
         {
-            ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = new UserName("系統訊息"), Topic = topic, ChatMessage = new ChatText(payload) };
+            ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = new UserName("System"), Topic = topic, ChatMessage = new ChatText(payload) };
             //ChatMessage chatMessage = new ChatMessage() { UserName = "系統訊息", Message = payload };
             var jsonStr = JsonConvert.SerializeObject(chatRoomMessage);
             var message = new MqttApplicationMessageBuilder()
