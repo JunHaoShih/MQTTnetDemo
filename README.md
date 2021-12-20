@@ -203,11 +203,12 @@ DisconnectedHandler是一個MqttClientDisconnectedHandlerDelegate，是用來處
 /// <param name="e"></param>
 private void OnClientDisconnected(MqttClientDisconnectedEventArgs e)
 {
+    // ClientWasConnected為true表示斷線是發生在連線成功後，反之表示連一開始的連線都沒有成功
     if (e.Exception != null && e.ClientWasConnected)
     {
         MessageBox.Show($"發生錯誤{Environment.NewLine}{e.Exception.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
-    handler = null;
+    // TODO Do whatever you want
 }
 ```
 其中`e.Exception != null && e.ClientWasConnected`為連線成功後中斷的狀態
