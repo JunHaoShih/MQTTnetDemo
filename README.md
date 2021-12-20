@@ -1,7 +1,7 @@
 # MQTTnetDemo
 
 ## _簡介_
-若要觀看詳細說明，請至[Wiki][MQTTChatDemoWiki]
+若要觀看詳細程式碼說明，請至[Wiki][MQTTChatDemoWiki]
 
 MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subscribe`和`publish`的功能
 
