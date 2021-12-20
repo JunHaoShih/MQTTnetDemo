@@ -215,12 +215,72 @@ private void OnClientDisconnected(MqttClientDisconnectedEventArgs e)
 ```
 其中`e.Exception != null && e.ClientWasConnected`為連線成功後中斷的狀態
 
+### Subscribe
+向server發送訂閱請求
+```csharp
+/// <summary>
+/// 向MQTT伺服器訂閱Topic
+/// </summary>
+/// <param name="topic">Topic名稱</param>
+/// <returns></returns>
+public async Task SubscribeAsync(string topic, Action<string> OnError)
+{
+    try
+    {
+        var topicFilter = new MqttTopicFilterBuilder()
+        .WithTopic(topic)
+        // Qos要大於0，客戶端才可收到離線訊息
+        // AtMostOnce = 0, AtLeastOnce = 1, ExactlyOnce = 2
+        .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
+        .Build();
+        await mqttClient.SubscribeAsync(topicFilter);
+    }
+    catch (Exception e)
+    {
+        OnError(e.ToString());
+    }
+}
+```
+### Publish
+向server發佈訊息
+```csharp
+/// <summary>
+/// 非同步發布訊息
+/// </summary>
+/// <param name="topic">向指定Topic發布</param>
+/// <param name="chatMessage">發布訊息</param>
+/// <returns></returns>
+public async Task PublishAsync(string topic, string userInput, Action<string> OnError)
+{
+    try
+    {
+        // 將ChatMessage轉換成json字串
+        ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = userName, ChatMessage = new ChatText(userInput), Topic = topic };
+        //ChatMessage chatMessage = new ChatMessage() { UserName = userName, Message = userInput };
+        var message = JsonConvert.SerializeObject(chatRoomMessage);
+        var applicationMessage = new MqttApplicationMessageBuilder()
+            .WithTopic(topic)
+            .WithPayload(Encoding.UTF8.GetBytes(message))
+            // Qos要大於0，客戶端才可收到離線訊息
+            // AtMostOnce = 0, AtLeastOnce = 1, ExactlyOnce = 2
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
+            //.WithRetainFlag(true)
+            .Build();
+        await mqttClient.PublishAsync(applicationMessage);
+    }
+    catch (Exception e)
+    {
+        OnError(e.ToString());
+    }
+}
+```
+
 ### 啟動Client
 在clientOptions以及handler都設定好後，就可以啟動client了
 ```csharp
 await mqttClient.ConnectAsync(options);
 ```
-到這裡server就大功告成了!
+到這裡client就大功告成了!
 
 ### 實作
 詳細實作方式請參閱[MQTTChatClientHandler.cs][MQTTChatClientHandler]與[MainPresenter.cs][MainPresenter]
