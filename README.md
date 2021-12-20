@@ -163,6 +163,13 @@ await mqttServer.StartAsync(serverOptions);
 ### 實作
 詳細實作方式請參閱[MQTTChatHandler.cs][MQTTChatHandler]
 
+---
+
+## MQTTBrokerAspDotNetWebSocket
+由於內容比較多，請移至[Wiki][MQTTBrokerAspDotNetWebSocketWiki]觀看
+
+---
+
 ## MQTTChatClient
 此為用MQTTnet實作的客戶端聊天室Winform視窗，這邊講解MQTTChatClient的核心部分`MQTTChatClientHandler.cs`的實作方法
 
@@ -317,4 +324,5 @@ await mqttClient.ConnectAsync(options);
 [MQTTChatHandler]: </MQTTBrokerConsole/MQTT/MQTTChatHandler.cs>
 [MQTTChatClientHandler]: </MQTTChatClient/MQTT/MQTTChatClientHandler.cs>
 [MainPresenter]: </MQTTChatClient/Presenter/MainPresenter.cs>
+[MQTTBrokerAspDotNetWebSocketWiki]: <https://github.com/JunHaoShih/MQTTnetDemo/wiki/MQTTBrokerAspDotNetWebSocket>
 
