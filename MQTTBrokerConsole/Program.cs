@@ -11,9 +11,6 @@ namespace MQTTBrokerConsole
     {
         static void Main(string[] args)
         {
-            /*MQTTChatHandler mQTTHandler = new MQTTChatHandler();
-            mQTTHandler.Start();
-            Console.WriteLine("Hello World!");*/
             CompositionRoot().Resolve<MQTTApplication>().Run();
         }
 
@@ -36,7 +33,7 @@ namespace MQTTBrokerConsole
             builder.RegisterType<SqliteChatUserDao>().As<IChatUserDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
             builder.RegisterType<SqliteChatRoomMessageDao>().As<IChatRoomMessageDao>().WithParameter(new TypedParameter(typeof(string), sqlConnectionStr));
 
-            // initialize
+            // initialize sqlite
             IChatServerSchemaDao chatServerSchemaDao = new SqliteChatServerSchemaDao(sqlConnectionStr);
             chatServerSchemaDao.InitializeSchema();
 
