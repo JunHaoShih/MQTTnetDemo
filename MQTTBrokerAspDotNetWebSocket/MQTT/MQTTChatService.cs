@@ -33,18 +33,32 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
             this.chatRoomMessageDao = chatRoomMessageDao;
         }
 
+        /// <summary>
+        /// 初始化AspNetMqttServerOptions並build
+        /// </summary>
+        /// <param name="optionsBuilder"></param>
         public void BuildMqttServerOptions(AspNetMqttServerOptionsBuilder optionsBuilder)
         {
             optionsBuilder.WithoutDefaultEndpoint()
+                // 使用persistent Sessions，這樣離線後再次連線的客戶端才有辦法收到離線
+                // (前提是客戶端使用相同ClientId登入與Qos > 0)
                 .WithPersistentSessions()
+                // 設定backlog
                 .WithConnectionBacklog(appSettings.MqttBacklogs)
+                // 設定客戶端驗證
                 .WithConnectionValidator(ValidateConnector)
-                .WithSubscriptionInterceptor(InterCeptSubscription)
+                // 設定訂閱攔截
+                .WithSubscriptionInterceptor(InterceptSubscription)
+                // 設定訊息攔截
                 .WithApplicationMessageInterceptor(InterceptMessage)
                 //.WithStorage(new RetainedMessageHandler())
                 .Build();
         }
 
+        /// <summary>
+        /// 設定MQTT server的handler
+        /// </summary>
+        /// <param name="mqttServer"></param>
         public void ConfigureMqttServer(IMqttServer mqttServer)
         {
             // 設定server接收到客戶端發送的訊息的事件
@@ -96,7 +110,7 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
         /// 攔截訂閱
         /// </summary>
         /// <param name="context"></param>
-        private void InterCeptSubscription(MqttSubscriptionInterceptorContext context)
+        private void InterceptSubscription(MqttSubscriptionInterceptorContext context)
         {
             context.AcceptSubscription = true;
         }
@@ -171,6 +185,13 @@ namespace MQTTBrokerAspDotNetWebSocket.MQTT
             PublishMessage(e.TopicFilter, message);
         }
 
+        /// <summary>
+        /// MQTT server專用的訊息發布method
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <param name="payload"></param>
+        /// <param name="qos"></param>
+        /// <param name="retain"></param>
         private void PublishMessage(string topic, string payload, MqttQualityOfServiceLevel qos = MqttQualityOfServiceLevel.ExactlyOnce, bool retain = false)
         {
             ChatRoomMessage chatRoomMessage = new ChatRoomMessage { UserName = new UserName("System"), Topic = topic, ChatMessage = new ChatText(payload) };
