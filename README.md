@@ -7,6 +7,8 @@
 
 MQTTnetDemo是用聊天室來展示如何用`MQTTnet`來進行MQTT基本的`subscribe`和`publish`的功能
 
+PS: 本範例MQTTnet版本為`3.1.1`，而.NET版本為`.NET Core 3.1`
+
 ## MQTTBrokerConsole
 此為用MQTTnet實作的聊天室server，這邊開始講解如何使用MqttServer
 
