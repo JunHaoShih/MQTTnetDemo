@@ -161,7 +161,7 @@ await mqttServer.StartAsync(serverOptions);
 到這裡server就大功告成了!
 
 ### 實作
-詳細實作方式請參閱[MQTTChatHandler.cs][MQTTChatHandler]
+詳細實作方式請參閱[MQTTChatService.cs][MQTTChatService]
 
 ---
 
@@ -318,11 +318,11 @@ await mqttClient.ConnectAsync(options);
 到這裡client就大功告成了!
 
 ### 實作
-詳細實作方式請參閱[MQTTChatClientHandler.cs][MQTTChatClientHandler]與[MainPresenter.cs][MainPresenter]
+詳細實作方式請參閱[MQTTChatClientHandler.cs][MQTTChatClientHandler]與[MqttService.cs][MqttService]
 
 [MQTTChatDemoWiki]: <https://github.com/JunHaoShih/MQTTnetDemo/wiki>
-[MQTTChatHandler]: </MQTTBrokerConsole/MQTT/MQTTChatHandler.cs>
+[MQTTChatService]: </MQTTBrokerConsole/MQTT/MQTTChatService.cs>
 [MQTTChatClientHandler]: </MQTTChatClient/MQTT/MQTTChatClientHandler.cs>
-[MainPresenter]: </MQTTChatClient/Presenter/MainPresenter.cs>
+[MqttService]: </MQTTChatClient/Service/MqttService.cs>
 [MQTTBrokerAspDotNetWebSocketWiki]: <https://github.com/JunHaoShih/MQTTnetDemo/wiki/MQTTBrokerAspDotNetWebSocket>
 
