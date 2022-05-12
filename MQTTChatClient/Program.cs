@@ -29,7 +29,7 @@ namespace MQTTChatClient
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<MainForm>().InstancePerLifetimeScope().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
-            builder.RegisterType<MqttService>().InstancePerLifetimeScope();
+            builder.RegisterType<MqttService>().As<IMqttService>().InstancePerLifetimeScope();
 
             return builder.Build();
         }

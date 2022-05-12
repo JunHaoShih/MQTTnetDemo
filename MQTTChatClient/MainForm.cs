@@ -29,7 +29,7 @@ namespace MQTTChatClient
         /// <summary>
         /// MQTT服務，由Autofac注入
         /// </summary>
-        public MqttService MqttService { get; set; }
+        public IMqttService MqttService { get; set; }
 
         /// <summary>
         /// 聊天室主視窗的建構子，初始化UI與topicControls
@@ -87,10 +87,10 @@ namespace MQTTChatClient
 
                 TabPage tabPage = new TabPage(topic);
                 tabPage.Controls.Add(chatControl);
-                //tabControlChat.TabPages.Add(tabPage);
                 AddTabPage(tabPage);
                 return true;
             }
+            chatControl = topicControls[topic];
             return false;
         }
 
@@ -139,7 +139,15 @@ namespace MQTTChatClient
 
         private void btnJoinChat_Click(object sender, EventArgs e)
         {
-            MqttService.OpenJoinChatDialog();
+            using (var joinChatDialog = new JoinChatDialog())
+            {
+                // 開啟對話框並取得DialogResult
+                var dialogResult = joinChatDialog.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    MqttService.JoinChat(joinChatDialog.Topic);
+                }
+            }
         }
 
         private void tbIp_KeyPress(object sender, KeyPressEventArgs e)
@@ -170,6 +178,9 @@ namespace MQTTChatClient
             HandleUrlDisplay();
         }
 
+        /// <summary>
+        /// 處理顯示URL
+        /// </summary>
         private void HandleUrlDisplay()
         {
             if (((MQTTProtocol)cbProtocol.SelectedItem) == MQTTProtocol.TCP)

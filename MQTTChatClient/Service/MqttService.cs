@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace MQTTChatClient.Service
 {
-    public class MqttService
+    public class MqttService : IMqttService
     {
         /// <summary>
         /// MQTT聊天室的客戶端
@@ -131,8 +131,6 @@ namespace MQTTChatClient.Service
         /// <summary>
         /// 與server中斷連線
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void DisconnectFromMqttServer()
         {
             if (handler != null)
@@ -140,30 +138,21 @@ namespace MQTTChatClient.Service
                 _ = handler.ClientEndAsync(OnError);
             }
         }
-        
+
         /// <summary>
-         /// 開啟加入聊天室對話框
-         /// </summary>
-         /// <param name="sender"></param>
-         /// <param name="e"></param>
-        public void OpenJoinChatDialog()
+        /// 加入聊天室
+        /// </summary>
+        /// <param name="topic">較加入的聊天室名稱(同時也是mqtt的Topic)</param>
+        public void JoinChat(string topic)
         {
-            using (var joinChatDialog = new JoinChatDialog())
+            // 訂閱對話框輸入的Topic
+            _ = handler.SubscribeAsync(topic, OnError);
+            // 嘗試為該Topic新增TabPage
+            var IsAdded = mainForm.TryAddChatTabPage(topic, out ChatControl chatControl);
+            // 若有新增，則把回傳的ChatControl的發送按鈕click事件與ChatControlPublish連結
+            if (IsAdded)
             {
-                // 開啟對話框並取得DialogResult
-                var dialogResult = joinChatDialog.ShowDialog();
-                if (dialogResult == System.Windows.Forms.DialogResult.OK)
-                {
-                    // 訂閱對話框輸入的Topic
-                    _ = handler.SubscribeAsync(joinChatDialog.Topic, OnError);
-                    // 嘗試為該Topic新增TabPage
-                    var IsAdded = mainForm.TryAddChatTabPage(joinChatDialog.Topic, out ChatControl chatControl);
-                    // 若有新增，則把回傳的ChatControl的發送按鈕click事件與ChatControlPublish連結
-                    if (IsAdded)
-                    {
-                        chatControl.OnBtnMessageSendClicked += ChatControlPublish;
-                    }
-                }
+                chatControl.OnBtnMessageSendClicked += ChatControlPublish;
             }
         }
 
