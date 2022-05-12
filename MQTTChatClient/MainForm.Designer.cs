@@ -49,6 +49,8 @@ namespace MQTTChatClient
             this.lblPort = new System.Windows.Forms.Label();
             this.lblIp = new System.Windows.Forms.Label();
             this.tbIp = new System.Windows.Forms.TextBox();
+            this.lblUrl = new System.Windows.Forms.Label();
+            this.lblUrlDisplay = new System.Windows.Forms.Label();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.panelMain.SuspendLayout();
@@ -67,7 +69,7 @@ namespace MQTTChatClient
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMain.Location = new System.Drawing.Point(0, 0);
             this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(800, 450);
+            this.panelMain.Size = new System.Drawing.Size(800, 504);
             this.panelMain.TabIndex = 0;
             // 
             // panelCenter
@@ -76,9 +78,9 @@ namespace MQTTChatClient
             this.panelCenter.Controls.Add(this.panelCenterTop);
             this.panelCenter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelCenter.Enabled = false;
-            this.panelCenter.Location = new System.Drawing.Point(0, 83);
+            this.panelCenter.Location = new System.Drawing.Point(0, 97);
             this.panelCenter.Name = "panelCenter";
-            this.panelCenter.Size = new System.Drawing.Size(800, 330);
+            this.panelCenter.Size = new System.Drawing.Size(800, 370);
             this.panelCenter.TabIndex = 2;
             // 
             // tabControlChat
@@ -87,7 +89,7 @@ namespace MQTTChatClient
             this.tabControlChat.Location = new System.Drawing.Point(0, 36);
             this.tabControlChat.Name = "tabControlChat";
             this.tabControlChat.SelectedIndex = 0;
-            this.tabControlChat.Size = new System.Drawing.Size(800, 294);
+            this.tabControlChat.Size = new System.Drawing.Size(800, 334);
             this.tabControlChat.TabIndex = 1;
             // 
             // panelCenterTop
@@ -112,7 +114,7 @@ namespace MQTTChatClient
             // panelBottom
             // 
             this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelBottom.Location = new System.Drawing.Point(0, 413);
+            this.panelBottom.Location = new System.Drawing.Point(0, 467);
             this.panelBottom.Name = "panelBottom";
             this.panelBottom.Size = new System.Drawing.Size(800, 37);
             this.panelBottom.TabIndex = 1;
@@ -125,7 +127,7 @@ namespace MQTTChatClient
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(800, 83);
+            this.panelTop.Size = new System.Drawing.Size(800, 97);
             this.panelTop.TabIndex = 0;
             // 
             // tlpConnection
@@ -149,19 +151,24 @@ namespace MQTTChatClient
             this.tlpConnection.Controls.Add(this.lblPort, 4, 0);
             this.tlpConnection.Controls.Add(this.lblIp, 2, 0);
             this.tlpConnection.Controls.Add(this.tbIp, 3, 0);
+            this.tlpConnection.Controls.Add(this.lblUrl, 0, 2);
+            this.tlpConnection.Controls.Add(this.lblUrlDisplay, 1, 2);
             this.tlpConnection.Location = new System.Drawing.Point(12, 12);
             this.tlpConnection.Name = "tlpConnection";
-            this.tlpConnection.RowCount = 2;
-            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpConnection.Size = new System.Drawing.Size(611, 54);
+            this.tlpConnection.RowCount = 3;
+            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33F));
+            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33F));
+            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34F));
+            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tlpConnection.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tlpConnection.Size = new System.Drawing.Size(611, 81);
             this.tlpConnection.TabIndex = 0;
             // 
             // lblProtocol
             // 
             this.lblProtocol.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblProtocol.AutoSize = true;
-            this.lblProtocol.Location = new System.Drawing.Point(12, 6);
+            this.lblProtocol.Location = new System.Drawing.Point(12, 5);
             this.lblProtocol.Name = "lblProtocol";
             this.lblProtocol.Size = new System.Drawing.Size(55, 15);
             this.lblProtocol.TabIndex = 0;
@@ -169,7 +176,7 @@ namespace MQTTChatClient
             // 
             // tbPassword
             // 
-            this.tbPassword.Location = new System.Drawing.Point(473, 30);
+            this.tbPassword.Location = new System.Drawing.Point(473, 29);
             this.tbPassword.Name = "tbPassword";
             this.tbPassword.PasswordChar = '*';
             this.tbPassword.Size = new System.Drawing.Size(118, 23);
@@ -179,10 +186,11 @@ namespace MQTTChatClient
             // tbPath
             // 
             this.tbPath.Enabled = false;
-            this.tbPath.Location = new System.Drawing.Point(73, 30);
+            this.tbPath.Location = new System.Drawing.Point(73, 29);
             this.tbPath.Name = "tbPath";
             this.tbPath.Size = new System.Drawing.Size(121, 23);
             this.tbPath.TabIndex = 7;
+            this.tbPath.TextChanged += new System.EventHandler(this.tbIp_TextChanged);
             // 
             // nudPort
             // 
@@ -200,13 +208,14 @@ namespace MQTTChatClient
             0,
             0,
             0});
+            this.nudPort.ValueChanged += new System.EventHandler(this.tbIp_TextChanged);
             this.nudPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbIp_KeyPress);
             // 
             // lblPassword
             // 
             this.lblPassword.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(436, 33);
+            this.lblPassword.Location = new System.Drawing.Point(436, 31);
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(31, 15);
             this.lblPassword.TabIndex = 10;
@@ -214,7 +223,7 @@ namespace MQTTChatClient
             // 
             // tbUserName
             // 
-            this.tbUserName.Location = new System.Drawing.Point(273, 30);
+            this.tbUserName.Location = new System.Drawing.Point(273, 29);
             this.tbUserName.Name = "tbUserName";
             this.tbUserName.Size = new System.Drawing.Size(144, 23);
             this.tbUserName.TabIndex = 9;
@@ -224,7 +233,7 @@ namespace MQTTChatClient
             // 
             this.lblPath.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblPath.AutoSize = true;
-            this.lblPath.Location = new System.Drawing.Point(35, 33);
+            this.lblPath.Location = new System.Drawing.Point(35, 31);
             this.lblPath.Name = "lblPath";
             this.lblPath.Size = new System.Drawing.Size(32, 15);
             this.lblPath.TabIndex = 6;
@@ -244,7 +253,7 @@ namespace MQTTChatClient
             // 
             this.lblUserName.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblUserName.AutoSize = true;
-            this.lblUserName.Location = new System.Drawing.Point(236, 33);
+            this.lblUserName.Location = new System.Drawing.Point(236, 31);
             this.lblUserName.Name = "lblUserName";
             this.lblUserName.Size = new System.Drawing.Size(31, 15);
             this.lblUserName.TabIndex = 8;
@@ -254,7 +263,7 @@ namespace MQTTChatClient
             // 
             this.lblPort.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblPort.AutoSize = true;
-            this.lblPort.Location = new System.Drawing.Point(437, 6);
+            this.lblPort.Location = new System.Drawing.Point(437, 5);
             this.lblPort.Name = "lblPort";
             this.lblPort.Size = new System.Drawing.Size(30, 15);
             this.lblPort.TabIndex = 4;
@@ -264,7 +273,7 @@ namespace MQTTChatClient
             // 
             this.lblIp.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblIp.AutoSize = true;
-            this.lblIp.Location = new System.Drawing.Point(250, 6);
+            this.lblIp.Location = new System.Drawing.Point(250, 5);
             this.lblIp.Name = "lblIp";
             this.lblIp.Size = new System.Drawing.Size(17, 15);
             this.lblIp.TabIndex = 2;
@@ -278,7 +287,29 @@ namespace MQTTChatClient
             this.tbIp.PlaceholderText = "請輸入Server IP";
             this.tbIp.Size = new System.Drawing.Size(144, 23);
             this.tbIp.TabIndex = 3;
+            this.tbIp.TextChanged += new System.EventHandler(this.tbIp_TextChanged);
             this.tbIp.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbIp_KeyPress);
+            // 
+            // lblUrl
+            // 
+            this.lblUrl.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.lblUrl.AutoSize = true;
+            this.lblUrl.Location = new System.Drawing.Point(37, 59);
+            this.lblUrl.Name = "lblUrl";
+            this.lblUrl.Size = new System.Drawing.Size(30, 15);
+            this.lblUrl.TabIndex = 12;
+            this.lblUrl.Text = "URL";
+            // 
+            // lblUrlDisplay
+            // 
+            this.lblUrlDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblUrlDisplay.AutoSize = true;
+            this.tlpConnection.SetColumnSpan(this.lblUrlDisplay, 5);
+            this.lblUrlDisplay.Location = new System.Drawing.Point(73, 59);
+            this.lblUrlDisplay.Name = "lblUrlDisplay";
+            this.lblUrlDisplay.Size = new System.Drawing.Size(544, 15);
+            this.lblUrlDisplay.TabIndex = 13;
+            this.lblUrlDisplay.Text = "label1";
             // 
             // btnDisconnect
             // 
@@ -304,7 +335,7 @@ namespace MQTTChatClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 504);
             this.Controls.Add(this.panelMain);
             this.Name = "MainForm";
             this.Text = "MQTT聊天室";
@@ -343,6 +374,8 @@ namespace MQTTChatClient
         private System.Windows.Forms.TextBox tbPath;
         private System.Windows.Forms.Label lblPath;
         private System.Windows.Forms.TableLayoutPanel tlpConnection;
+        private System.Windows.Forms.Label lblUrl;
+        private System.Windows.Forms.Label lblUrlDisplay;
     }
 }
 

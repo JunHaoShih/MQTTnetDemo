@@ -1,4 +1,5 @@
-using MQTTChatClient.Presenter;
+using Autofac;
+using MQTTChatClient.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,19 @@ namespace MQTTChatClient
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var view = new MainForm();
+            /*var view = new MainForm();
             _ = new MainPresenter(view);
-            Application.Run(view);
+            Application.Run(view);*/
+            Application.Run(CompositionRoot().Resolve<MainForm>());
+        }
+
+        private static IContainer CompositionRoot()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterType<MainForm>().InstancePerLifetimeScope().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
+            builder.RegisterType<MqttService>().InstancePerLifetimeScope();
+
+            return builder.Build();
         }
     }
 }

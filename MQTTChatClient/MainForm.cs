@@ -1,5 +1,6 @@
 ﻿using MQTTChatClient.Enumerations;
 using MQTTChatClient.MQTT;
+using MQTTChatClient.Service;
 using MQTTChatClient.View;
 using MQTTDataAccessLib.Models;
 using MQTTDataAccessLib.Models.DataTypes;
@@ -21,24 +22,14 @@ namespace MQTTChatClient
     public partial class MainForm : Form
     {
         /// <summary>
-        /// 連線按鈕click事件
-        /// </summary>
-        public event Action<MQTTProtocol, string, string, int, string, string> OnConnectionClicked;
-
-        /// <summary>
-        /// 登出按鈕click事件
-        /// </summary>
-        public event EventHandler OnDisconnectClicked;
-
-        /// <summary>
-        /// 加入聊天室click事件
-        /// </summary>
-        public event EventHandler OnJoinChatClicked;
-
-        /// <summary>
         /// 紀錄topic與其對應之ChatControl
         /// </summary>
         private Dictionary<string, ChatControl> topicControls;
+
+        /// <summary>
+        /// MQTT服務，由Autofac注入
+        /// </summary>
+        public MqttService MqttService { get; set; }
 
         /// <summary>
         /// 聊天室主視窗的建構子，初始化UI與topicControls
@@ -60,10 +51,6 @@ namespace MQTTChatClient
         {
             var result = tlpConnection.BeginInvoke((MethodInvoker)delegate
             {
-                /*tbIp.Enabled = enable;
-                nudPort.Enabled = enable;
-                tbUserName.Enabled = enable;
-                tbPassword.Enabled = enable;*/
                 tlpConnection.Enabled = enable;
                 btnConnect.Enabled = enable;
             });
@@ -142,17 +129,17 @@ namespace MQTTChatClient
         private void btnConnect_Click(object sender, EventArgs e)
         {
             MQTTProtocol protocol = (MQTTProtocol)cbProtocol.SelectedItem;
-            OnConnectionClicked.Invoke(protocol, tbPath.Text, tbIp.Text, ((int)nudPort.Value), tbUserName.Text, tbPassword.Text);
+            MqttService.ConnectToMqttServer(protocol, tbPath.Text, tbIp.Text, ((int)nudPort.Value), tbUserName.Text, tbPassword.Text);
         }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
-            OnDisconnectClicked.Invoke(sender, e);
+            MqttService.DisconnectFromMqttServer();
         }
 
         private void btnJoinChat_Click(object sender, EventArgs e)
         {
-            OnJoinChatClicked.Invoke(sender, e);
+            MqttService.OpenJoinChatDialog();
         }
 
         private void tbIp_KeyPress(object sender, KeyPressEventArgs e)
@@ -174,6 +161,24 @@ namespace MQTTChatClient
                 case MQTTProtocol.WebSocket:
                     tbPath.Enabled = true;
                     break;
+            }
+            HandleUrlDisplay();
+        }
+
+        private void tbIp_TextChanged(object sender, EventArgs e)
+        {
+            HandleUrlDisplay();
+        }
+
+        private void HandleUrlDisplay()
+        {
+            if (((MQTTProtocol)cbProtocol.SelectedItem) == MQTTProtocol.TCP)
+            {
+                lblUrlDisplay.Text = $"{tbIp.Text}:{nudPort.Value}";
+            }
+            else
+            {
+                lblUrlDisplay.Text = $"ws://{tbIp.Text}:{nudPort.Value}/{tbPath.Text}";
             }
         }
     }

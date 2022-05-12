@@ -12,12 +12,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MQTTChatClient.Presenter
+namespace MQTTChatClient.Service
 {
-    /// <summary>
-    /// 聊天室主視窗的Presenter
-    /// </summary>
-    public class MainPresenter
+    public class MqttService
     {
         /// <summary>
         /// MQTT聊天室的客戶端
@@ -25,31 +22,17 @@ namespace MQTTChatClient.Presenter
         private MQTTChatClientHandler handler = null;
 
         /// <summary>
-        /// 聊天室的主視窗
+        /// 主視窗
         /// </summary>
-        private readonly MainForm view;
+        private MainForm mainForm;
 
         /// <summary>
-        /// 聊天室主視窗Presenter的建構子，將主視窗的event與presenter連結
+        /// MqttService的建構子，Autofac會在這裡注入主視窗MainForm
         /// </summary>
-        /// <param name="form"></param>
-        public MainPresenter(MainForm form)
+        /// <param name="mainForm"></param>
+        public MqttService(MainForm mainForm)
         {
-            view = form;
-            SetEventLinks();
-        }
-
-        /// <summary>
-        /// 與MainForm的事件做連結
-        /// </summary>
-        private void SetEventLinks()
-        {
-            // 將MainForm的連線按鈕click事件與ConnectToMqttServer連結
-            view.OnConnectionClicked += ConnectToMqttServer;
-            // 將MainForm的登出按鈕click事件與DisconnectFromMqttServer連結
-            view.OnDisconnectClicked += DisconnectFromMqttServer;
-            // 將MainForm的加入聊天室按鈕click事件與OpenJoinChatDialog連結
-            view.OnJoinChatClicked += OpenJoinChatDialog;
+            this.mainForm = mainForm;
         }
 
         /// <summary>
@@ -61,31 +44,30 @@ namespace MQTTChatClient.Presenter
         /// <param name="port">MQTT伺服器的PORT</param>
         /// <param name="userName">帳號</param>
         /// <param name="password">密碼</param>
-        private void ConnectToMqttServer(MQTTProtocol protocol, string path, string ip, int port, string userName, string password)
+        public void ConnectToMqttServer(MQTTProtocol protocol, string path, string ip, int port, string userName, string password)
         {
-            if (handler == null)
+            if (handler != null)
             {
-                var isUserNameValid = UserName.TryParse(userName, out UserName userNameObj);
-                var isPasswordValid = Password.TryParse(password, out Password passwordObj);
-                if (isUserNameValid && isPasswordValid)
+                return;
+            }
+            var isUserNameValid = UserName.TryParse(userName, out UserName userNameObj);
+            var isPasswordValid = Password.TryParse(password, out Password passwordObj);
+            if (isUserNameValid && isPasswordValid)
+            {
+                handler = new MQTTChatClientHandler(ip, port, userNameObj, passwordObj);
+                switch (protocol)
                 {
-                    handler = new MQTTChatClientHandler(ip, port, userNameObj, passwordObj);
-                    switch (protocol)
-                    {
-                        case MQTTProtocol.TCP:
-                            _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
-                            break;
-                        case MQTTProtocol.WebSocket:
-                            _ = handler.WebSocketClientStartAsync(path, OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
-                            break;
-                    }
+                    case MQTTProtocol.TCP:
+                        _ = handler.ClientStartAsync(OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                        break;
+                    case MQTTProtocol.WebSocket:
+                        _ = handler.WebSocketClientStartAsync(path, OnMessageReceived, OnClientConnected, OnClientDisconnected, OnError);
+                        break;
                 }
-                else
-                {
-                    OnError("帳號密碼格式不正確");
-                }
-
-                
+            }
+            else
+            {
+                OnError("帳號密碼格式不正確");
             }
         }
 
@@ -108,11 +90,11 @@ namespace MQTTChatClient.Presenter
         private void OnClientDisconnected(MqttClientDisconnectedEventArgs e)
         {
             // 將連線的UI給enable
-            view.EnableConnectionUI(true);
+            mainForm.EnableConnectionUI(true);
             // 將聊天的UI給disable
-            view.EnablePanelCenter(false);
+            mainForm.EnablePanelCenter(false);
             // 清除聊天的tabpage與dictionary
-            view.ClearAllTopics();
+            mainForm.ClearAllTopics();
             if (e.Exception != null && e.ClientWasConnected)
             {
                 MessageBox.Show($"發生錯誤{Environment.NewLine}{e.Exception.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -128,9 +110,9 @@ namespace MQTTChatClient.Presenter
         private void OnClientConnected(MqttClientConnectedEventArgs e)
         {
             // 將連線的UI給disable
-            view.EnableConnectionUI(false);
+            mainForm.EnableConnectionUI(false);
             // 將聊天的UI給enable
-            view.EnablePanelCenter(true);
+            mainForm.EnablePanelCenter(true);
         }
 
         /// <summary>
@@ -142,8 +124,8 @@ namespace MQTTChatClient.Presenter
         {
             var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
             ChatRoomMessage chatRoomMessage = JsonConvert.DeserializeObject<ChatRoomMessage>(message);
-            view.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
-            view.AppendTopicMessage(e.ApplicationMessage.Topic, chatRoomMessage);
+            mainForm.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
+            mainForm.AppendTopicMessage(e.ApplicationMessage.Topic, chatRoomMessage);
         }
 
         /// <summary>
@@ -151,20 +133,20 @@ namespace MQTTChatClient.Presenter
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DisconnectFromMqttServer(object sender, EventArgs e)
+        public void DisconnectFromMqttServer()
         {
             if (handler != null)
             {
                 _ = handler.ClientEndAsync(OnError);
             }
         }
-
+        
         /// <summary>
-        /// 開啟加入聊天室對話框
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenJoinChatDialog(object sender, EventArgs e)
+         /// 開啟加入聊天室對話框
+         /// </summary>
+         /// <param name="sender"></param>
+         /// <param name="e"></param>
+        public void OpenJoinChatDialog()
         {
             using (var joinChatDialog = new JoinChatDialog())
             {
@@ -175,7 +157,7 @@ namespace MQTTChatClient.Presenter
                     // 訂閱對話框輸入的Topic
                     _ = handler.SubscribeAsync(joinChatDialog.Topic, OnError);
                     // 嘗試為該Topic新增TabPage
-                    var IsAdded = view.TryAddChatTabPage(joinChatDialog.Topic, out ChatControl chatControl);
+                    var IsAdded = mainForm.TryAddChatTabPage(joinChatDialog.Topic, out ChatControl chatControl);
                     // 若有新增，則把回傳的ChatControl的發送按鈕click事件與ChatControlPublish連結
                     if (IsAdded)
                     {
