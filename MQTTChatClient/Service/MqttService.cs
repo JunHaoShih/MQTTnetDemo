@@ -124,7 +124,11 @@ namespace MQTTChatClient.Service
         {
             var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0]);
             ChatRoomMessage chatRoomMessage = JsonConvert.DeserializeObject<ChatRoomMessage>(message);
-            mainForm.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
+            var IsAdded = mainForm.TryAddChatTabPage(e.ApplicationMessage.Topic, out ChatControl chatControl);
+            if (IsAdded)
+            {
+                chatControl.OnBtnMessageSendClicked += ChatControlPublish;
+            }
             mainForm.AppendTopicMessage(e.ApplicationMessage.Topic, chatRoomMessage);
         }
 
